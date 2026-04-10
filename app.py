@@ -4,6 +4,15 @@ import streamlit as st
 
 from crawler_logic import crawl_products
 
+hide_st_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            header {visibility: hidden;}
+            footer {visibility: hidden;}
+            .st-emotion-cache-163ttbj {visibility: hidden;} 
+            </style>
+            """
+st.markdown(hide_st_style, unsafe_allow_html=True)
 
 st.set_page_config(
     page_title="Công Cụ Tra Cứu Sản Phẩm MegaMarket",
