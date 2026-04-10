@@ -14,21 +14,18 @@ st.set_page_config(
 )
 hide_st_style = """
             <style>
-            /* Ẩn Menu trên cùng */
+            /* Ẩn nút Menu 3 chấm góc trên bên phải */
             #MainMenu {visibility: hidden;}
-            /* Ẩn Header */
-            header {visibility: hidden;}
-            /* Ẩn Footer mặc định */
-            footer {visibility: hidden;}
             
-            /* Ẩn Watermark, Viewer Badge và Avatar góc dưới cùng bên phải */
-            #viewerBadge_container__ {display: none !important;}
-            [data-testid="viewerBadge"] {display: none !important;}
-            [data-testid="manage-app-button"] {display: none !important;}
-            .viewerBadge_container {display: none !important;}
-            
-            /* Ẩn nút Deploy nếu có */
+            /* Ẩn nút Deploy (nếu có) */
+            [data-testid="stAppDeployButton"] {display: none !important;}
             .stDeployButton {display: none !important;}
+            
+            /* Ẩn Watermark, Avatar và Viewer Badge ở góc dưới cùng bên phải */
+            [data-testid="viewerBadge"] {display: none !important;}
+            
+            /* Ẩn Footer mặc định của Streamlit (Made with Streamlit) */
+            footer {visibility: hidden;}
             </style>
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
