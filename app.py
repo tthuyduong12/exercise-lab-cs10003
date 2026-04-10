@@ -12,6 +12,26 @@ st.set_page_config(
     page_icon="🛒",
     layout="wide",
 )
+hide_st_style = """
+            <style>
+            /* Ẩn Menu trên cùng */
+            #MainMenu {visibility: hidden;}
+            /* Ẩn Header */
+            header {visibility: hidden;}
+            /* Ẩn Footer mặc định */
+            footer {visibility: hidden;}
+            
+            /* Ẩn Watermark, Viewer Badge và Avatar góc dưới cùng bên phải */
+            #viewerBadge_container__ {display: none !important;}
+            [data-testid="viewerBadge"] {display: none !important;}
+            [data-testid="manage-app-button"] {display: none !important;}
+            .viewerBadge_container {display: none !important;}
+            
+            /* Ẩn nút Deploy nếu có */
+            .stDeployButton {display: none !important;}
+            </style>
+            """
+st.markdown(hide_st_style, unsafe_allow_html=True)
 
 def clean_input(raw_kw: str) -> str:
     if not raw_kw: return ""
