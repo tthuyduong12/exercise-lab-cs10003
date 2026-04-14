@@ -14,17 +14,13 @@ st.set_page_config(
 )
 hide_st_style = """
             <style>
-            /* Ẩn nút Menu 3 chấm góc trên bên phải */
             #MainMenu {visibility: hidden;}
             
-            /* Ẩn nút Deploy (nếu có) */
             [data-testid="stAppDeployButton"] {display: none !important;}
             .stDeployButton {display: none !important;}
             
-            /* Ẩn Watermark, Avatar và Viewer Badge ở góc dưới cùng bên phải */
             [data-testid="viewerBadge"] {display: none !important;}
             
-            /* Ẩn Footer mặc định của Streamlit (Made with Streamlit) */
             footer {visibility: hidden;}
             </style>
             """
