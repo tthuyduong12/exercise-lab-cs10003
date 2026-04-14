@@ -5,7 +5,7 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-from crawler_logic import crawl_products
+from mm import crawl_products
 
 st.set_page_config(
     page_title="OMD Data MegaMarket Crawler",
