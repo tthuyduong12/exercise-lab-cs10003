@@ -7,7 +7,6 @@ from typing import Any
 import requests
 
 
-GRAPHQL_URL = "https://online.mmvietnam.com/graphql"
 HEADERS = {
     "Content-Type": "application/json",
     "User-Agent": (
@@ -84,9 +83,10 @@ def flatten_products(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return rows
 
 
-def save_to_csv(rows: list[dict[str, Any]], keyword: str, output_dir: Path) -> Path:
+def save_to_csv(rows: list[dict[str, Any]], keyword: str, output_dir: Path, source_prefix: str = "") -> Path:
     output_dir.mkdir(parents=True, exist_ok=True)
-    file_path = output_dir / f"search_{sanitize_filename(keyword)}.csv"
+    prefix = f"{source_prefix}_" if source_prefix else ""
+    file_path = output_dir / f"{prefix}search_{sanitize_filename(keyword)}.csv"
 
     with file_path.open("w", encoding="utf-8-sig", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=list(rows[0].keys()))
@@ -96,7 +96,12 @@ def save_to_csv(rows: list[dict[str, Any]], keyword: str, output_dir: Path) -> P
     return file_path
 
 
-def crawl_products(keyword: str, output_dir: str | Path | None = None) -> dict[str, Any]:
+def crawl_products(
+    keyword: str,
+    output_dir: str | Path | None = None,
+    graphql_url: str = "https://online.mmvietnam.com/graphql",
+    source_prefix: str = "cn",
+) -> dict[str, Any]:
     target_dir = Path(output_dir) if output_dir else Path(__file__).resolve().parent
     current_page = 1
     total_pages = 1
@@ -106,7 +111,7 @@ def crawl_products(keyword: str, output_dir: str | Path | None = None) -> dict[s
         while current_page <= total_pages:
             payload = build_search_payload(keyword, current_page)
             response = requests.post(
-                GRAPHQL_URL,
+                graphql_url,
                 headers=HEADERS,
                 json=payload,
                 timeout=REQUEST_TIMEOUT,
@@ -130,7 +135,7 @@ def crawl_products(keyword: str, output_dir: str | Path | None = None) -> dict[s
         if not all_products:
             return {"success": False, "message": "No products found."}
 
-        file_path = save_to_csv(all_products, keyword, target_dir)
+        file_path = save_to_csv(all_products, keyword, target_dir, source_prefix)
         file_bytes = file_path.read_bytes()
 
         return {

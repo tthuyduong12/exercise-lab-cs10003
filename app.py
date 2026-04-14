@@ -54,8 +54,8 @@ def clean_input(raw_kw: str) -> str:
     
     
 @st.cache_data(ttl=3600, show_spinner=False)
-def fetch_data(keyword: str):
-    result = crawl_products(keyword, output_dir=BASE_DIR)
+def fetch_data(keyword: str, graphql_url: str, source_prefix: str):
+    result = crawl_products(keyword, output_dir=BASE_DIR, graphql_url=graphql_url, source_prefix=source_prefix)
     if result.get("success") and result.get("file_bytes"):
         try:
             df = pd.read_csv(io.BytesIO(result["file_bytes"]))
@@ -79,11 +79,30 @@ if "result_df" not in st.session_state:
 
 st.title("🛒 OMD Data - MegaMarket Crawler")
 
-with st.sidebar:
-    st.header("Cấu hình quét")
-    auto_clean = st.checkbox("Tự động tối ưu từ khóa", value=True, 
-                             help="Ví dụ: 'HAO TOMCHUACAY 67G*24' -> 'Hao tomchuacay'")
-    delay_time = st.slider("Thời gian nghỉ giữa mỗi lần quét (giây)", 0.5, 5.0, 1.5)
+with st.expander("⚙️Crawling Settings", expanded=True):
+    col1, col2 = st.columns(2)
+    with col1:
+        source_option = st.radio(
+            "Nguồn dữ liệu",
+            options=[
+                "Khách hàng cá nhân (https://online.mmvietnam.com)",
+                "Khách hàng doanh nghiệp (https://mmpro.vn)"
+            ]
+        )
+        if "cá nhân" in source_option.lower():
+            graphql_url = "https://online.mmvietnam.com/graphql"
+            source_prefix = "cn"
+        else:
+            graphql_url = "https://mmpro.vn/graphql"
+            source_prefix = "dn"
+
+    with col2:
+        st.write("Optional")
+        auto_clean = st.checkbox("Tự động tối ưu từ khóa", value=True, 
+                                 help="Ví dụ: 'HAO TOMCHUACAY 67G*24' -> 'Hao tomchuacay'")
+        delay_time = st.slider("Thời gian nghỉ giữa mỗi lần quét (giây)", 0.5, 5.0, 1.5)
+
+st.write("")
 
 with st.container(border=True):
     tab1, tab2 = st.tabs(["Nhập sản phẩm", "Upload file list sản phẩm (.txt, .csv)"])
@@ -94,7 +113,7 @@ with st.container(border=True):
         if st.button("Bắt đầu quét", type="primary", key="btn_single"):
             search_kw = clean_input(keyword_input) if auto_clean else keyword_input
             with st.spinner(f"Đang tìm: {search_kw}..."):
-                success, df = fetch_data(search_kw)
+                success, df = fetch_data(search_kw, graphql_url, source_prefix)
                 if success:
                     st.session_state.result_df = df
                     st.session_state.result_ready = True
@@ -117,7 +136,7 @@ with st.container(border=True):
                 search_kw = clean_input(raw_kw) if auto_clean else raw_kw
                 status_text.text(f"Đang quét ({i+1}/{len(raw_keywords)}): {search_kw}")
                 
-                success, df = fetch_data(search_kw)
+                success, df = fetch_data(search_kw, graphql_url, source_prefix)
                 if success:
                     all_dfs.append(df)
                 
@@ -143,7 +162,7 @@ if st.session_state.result_ready:
         st.download_button(
             label="📥 Tải CSV (UTF-8-SIG)", 
             data=df.to_csv(index=False).encode('utf-8-sig'), 
-            file_name="result.csv", 
+            file_name=f"{source_prefix}_result.csv", 
             mime="text/csv", 
             use_container_width=True
         )
@@ -151,7 +170,7 @@ if st.session_state.result_ready:
         st.download_button(
             label="📊 Tải Excel (.xlsx)", 
             data=to_excel(df), 
-            file_name="result.xlsx", 
+            file_name=f"{source_prefix}_result.xlsx", 
             use_container_width=True
         )
     
