@@ -99,7 +99,7 @@ with st.expander("⚙️Crawling Settings", expanded=True):
     with col2:
         st.write("Optional")
         auto_clean = st.checkbox("Tự động tối ưu từ khóa", value=True, 
-                                 help="Ví dụ: 'HAO TOMCHUACAY 67G*24' -> 'Hao tomchuacay'")
+                                 help="Ví dụ: 'MI TOM CHUA HAO HAO ACE75G*30' -> 'Mi tom chua hao hao ace'")
         delay_time = st.slider("Thời gian nghỉ giữa mỗi lần quét (giây)", 0.5, 5.0, 1.5)
 
 st.write("")
